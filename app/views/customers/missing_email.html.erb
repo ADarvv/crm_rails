@@ -1,0 +1,15 @@
+<h1 class="title is-3">Customers Missing Email Addresses</h1>
+
+<nav class="menu mb-4">
+  <%= link_to "All Customers", root_path, class: "button is-link is-light mr-2" %>
+  <%= link_to "Alphabetized", alphabetized_customers_path, class: "button is-link is-light mr-2" %>
+  <%= link_to "Missing Emails", missing_email_customers_path, class: "button is-link is-light" %>
+</nav>
+
+<div class="customer-list columns is-multiline">
+  <% @customers.each do |customer| %>
+    <div class="column is-one-third">
+      <%= render partial: "customer", locals: { customer: customer } %>
+    </div>
+  <% end %>
+</div>
