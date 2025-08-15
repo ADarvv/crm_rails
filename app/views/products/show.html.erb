@@ -1,0 +1,138 @@
+<div class="columns">
+  <div class="column is-half">
+    <!-- Product Images -->
+    <% if @product.images.attached? %>
+      <div class="image-gallery">
+        <figure class="image mb-4">
+          <%= image_tag @product.main_image, alt: @product.name, id: "main-image" %>
+        </figure>
+        
+        <% if @product.images.count > 1 %>
+          <div class="columns is-multiline">
+            <% @product.images.each_with_index do |image, index| %>
+              <div class="column is-3">
+                <figure class="image is-square">
+                  <%= image_tag image, alt: @product.name, 
+                      class: "thumbnail #{'is-active' if index == 0}",
+                      onclick: "changeMainImage('#{url_for(image)}')" %>
+                </figure>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="has-background-grey-lighter is-flex is-align-items-center is-justify-content-center" style="height: 400px;">
+        <span class="has-text-grey is-size-3">No Image Available</span>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="column is-half">
+    <!-- Product Info -->
+    <h1 class="title is-2"><%= @product.name %></h1>
+    <h2 class="subtitle is-3 has-text-primary has-text-weight-bold"><%= @product.formatted_price %></h2>
+    
+    <!-- Categories -->
+    <% if @product.categories.any? %>
+      <div class="field">
+        <label class="label">Categories:</label>
+        <div class="tags">
+          <% @product.categories.each do |category| %>
+            <%= link_to category.name, products_path(category_id: category.id), class: "tag is-primary is-light" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    
+    <!-- Stock Status -->
+    <div class="field">
+      <% if @product.in_stock? %>
+        <span class="tag is-success">
+          <i class="fas fa-check mr-1"></i>
+          In Stock (<%= @product.stock_quantity %> available)
+        </span>
+      <% else %>
+        <span class="tag is-danger">
+          <i class="fas fa-times mr-1"></i>
+          Out of Stock
+        </span>
+      <% end %>
+    </div>
+    
+    <!-- Description -->
+    <div class="content">
+      <h3 class="title is-4">Description</h3>
+      <p><%= simple_format(@product.description) %></p>
+    </div>
+    
+    <!-- Add to Cart Form -->
+    <% if @product.in_stock? %>
+      <%= form_with url: cart_items_path, local: true, class: "box" do |f| %>
+        <%= f.hidden_field :product_id, value: @product.id %>
+        
+        <div class="field">
+          <label class="label">Quantity:</label>
+          <div class="control">
+            <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity, class: "input", style: "width: 100px;" %>
+          </div>
+        </div>
+        
+        <div class="field">
+          <div class="control">
+            <%= f.submit "Add to Cart", class: "button is-primary is-large is-fullwidth" %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="box">
+        <button class="button is-large is-fullwidth" disabled>Out of Stock</button>
+      </div>
+    <% end %>
+    
+    <!-- Action Buttons -->
+    <div class="buttons">
+      <%= link_to "Back to Products", products_path, class: "button is-light" %>
+    </div>
+  </div>
+</div>
+
+<!-- Related Products -->
+<% if @related_products.any? %>
+  <section class="section">
+    <h3 class="title is-3">Related Products</h3>
+    
+    <div class="columns is-multiline">
+      <% @related_products.each do |product| %>
+        <div class="column is-3">
+          <%= render partial: "product_card", locals: { product: product } %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<script>
+  function changeMainImage(src) {
+    document.getElementById('main-image').src = src;
+    
+    // Update active thumbnail
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+      thumb.classList.remove('is-active');
+    });
+    event.target.classList.add('is-active');
+  }
+</script>
+
+<style>
+  .thumbnail {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  
+  .thumbnail:hover,
+  .thumbnail.is-active {
+    opacity: 1;
+  }
+</style>

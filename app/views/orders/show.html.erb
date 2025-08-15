@@ -1,0 +1,63 @@
+<div class="has-text-centered mb-6">
+  <i class="fas fa-check-circle is-size-1 has-text-success mb-4"></i>
+  <h1 class="title is-2">Order Confirmed!</h1>
+  <p class="subtitle">Thank you for your purchase.</p>
+</div>
+
+<div class="columns">
+  <div class="column is-8 is-offset-2">
+    <div class="box">
+      <h2 class="title is-4">Order Details</h2>
+      
+      <div class="columns">
+        <div class="column">
+          <strong>Order #:</strong> <%= @order.id %><br>
+          <strong>Date:</strong> <%= @order.created_at.strftime("%B %d, %Y") %><br>
+          <strong>Status:</strong> 
+          <span class="tag is-<%= @order.status == 'pending' ? 'warning' : 'success' %>">
+            <%= @order.status.humanize %>
+          </span>
+        </div>
+        
+        <div class="column">
+          <strong>Email:</strong> <%= @order.email %><br>
+          <strong>Total:</strong> $<%= @order.total_amount %>
+        </div>
+      </div>
+      
+      <hr>
+      
+      <h3 class="title is-5">Shipping Address</h3>
+      <p>
+        <%= @order.first_name %> <%= @order.last_name %><br>
+        <%= @order.address %><br>
+        <%= @order.city %>, <%= @order.province %> <%= @order.postal_code %>
+      </p>
+      
+      <hr>
+      
+      <h3 class="title is-5">Order Items</h3>
+      <% @order.order_items.each do |item| %>
+        <div class="level">
+          <div class="level-left">
+            <div>
+              <%= link_to item.product.name, product_path(item.product), class: "has-text-weight-semibold" %>
+              <br>
+              <small>Qty: <%= item.quantity %> × $<%= item.price_at_time %></small>
+            </div>
+          </div>
+          <div class="level-right">
+            <span class="has-text-weight-bold">$<%= item.total_price %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="has-text-centered">
+      <%= link_to "Continue Shopping", products_path, class: "button is-primary" %>
+      <% if user_signed_in? %>
+        <%= link_to "View All Orders", orders_path, class: "button is-light ml-2" %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,106 @@
+<h1 class="title is-2">Shopping Cart</h1>
+
+<% if @cart_items.any? %>
+  <div class="columns">
+    <div class="column is-8">
+      <!-- Cart Items -->
+      <% @cart_items.each do |cart_item| %>
+        <div class="box">
+          <div class="columns is-vcentered">
+            <div class="column is-2">
+              <% if cart_item.product.main_image %>
+                <%= image_tag cart_item.product.main_image, alt: cart_item.product.name, class: "image" %>
+              <% else %>
+                <div class="has-background-grey-lighter is-flex is-align-items-center is-justify-content-center" style="height: 80px;">
+                  <span class="has-text-grey">No Image</span>
+                </div>
+              <% end %>
+            </div>
+            
+            <div class="column is-4">
+              <h4 class="title is-5">
+                <%= link_to cart_item.product.name, product_path(cart_item.product) %>
+              </h4>
+              <p class="has-text-primary has-text-weight-bold"><%= cart_item.product.formatted_price %></p>
+            </div>
+            
+            <div class="column is-3">
+              <%= form_with model: cart_item, local: true do |f| %>
+                <div class="field has-addons">
+                  <div class="control">
+                    <%= f.number_field :quantity, min: 1, max: cart_item.product.stock_quantity, class: "input" %>
+                  </div>
+                  <div class="control">
+                    <%= f.submit "Update", class: "button is-info" %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            
+            <div class="column is-2">
+              <p class="has-text-weight-bold">$<%= cart_item.total_price %></p>
+            </div>
+            
+            <%= button_to cart_item_path(cart_item), method: :delete, 
+                form: { data: { turbo_confirm: "Are you sure?" } },
+                class: "button is-danger is-small" do %>
+                <i class="fas fa-trash"></i>
+            <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="column is-4">
+      <!-- Order Summary -->
+      <div class="box">
+        <h3 class="title is-4">Order Summary</h3>
+        
+        <div class="level">
+          <div class="level-left">
+            <span>Subtotal:</span>
+          </div>
+          <div class="level-right">
+            <span class="has-text-weight-bold">$<%= @total %></span>
+          </div>
+        </div>
+        
+        <div class="level">
+          <div class="level-left">
+            <span>Tax (13%):</span>
+          </div>
+          <div class="level-right">
+            <span>$<%= (@total * 0.13).round(2) %></span>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="level">
+          <div class="level-left">
+            <span class="has-text-weight-bold">Total:</span>
+          </div>
+          <div class="level-right">
+            <span class="has-text-weight-bold is-size-5">$<%= (@total * 1.13).round(2) %></span>
+          </div>
+        </div>
+        
+        <%= link_to "Proceed to Checkout", new_order_path, class: "button is-primary is-large is-fullwidth mt-4" %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="has-text-centered mt-4">
+    <%= link_to "Continue Shopping", products_path, class: "button is-light" %>
+  </div>
+<% else %>
+  <div class="has-text-centered">
+    <div class="box">
+      <i class="fas fa-shopping-cart is-size-1 has-text-grey mb-4"></i>
+      <h3 class="title is-3">Your cart is empty</h3>
+      <p>Start shopping to add items to your cart.</p>
+      <%= link_to "Shop Now", products_path, class: "button is-primary is-large mt-4" %>
+    </div>
+  </div>
+<% end %>

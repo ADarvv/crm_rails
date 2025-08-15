@@ -1,0 +1,49 @@
+<section class="hero is-medium is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title is-1">Welcome to My Store</h1>
+      <h2 class="subtitle">Discover amazing products at great prices!</h2>
+      <%= link_to "Shop Now", products_path, class: "button is-large is-white is-outlined" %>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="title is-2 has-text-centered">Featured Products</h2>
+    
+    <div class="columns is-multiline">
+      <% @featured_products.each do |product| %>
+        <div class="column is-3">
+          <%= render partial: "products/product_card", locals: { product: product } %>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="has-text-centered mt-5">
+      <%= link_to "View All Products", products_path, class: "button is-primary is-large" %>
+    </div>
+  </div>
+</section>
+
+<section class="section has-background-light">
+  <div class="container">
+    <h2 class="title is-2 has-text-centered">Shop by Category</h2>
+    
+    <div class="columns is-multiline">
+      <% @categories.each do |category| %>
+        <div class="column is-4">
+          <div class="box has-text-centered">
+            <% if category.image.attached? %>
+              <%= image_tag category.image, alt: category.name, class: "image is-128x128 mx-auto mb-3", style: "object-fit: cover;" %>
+            <% end %>
+            <h3 class="title is-4"><%= category.name %></h3>
+            <p><%= category.description %></p>
+            <p class="has-text-grey"><%= pluralize(category.product_count, 'product') %></p>
+            <%= link_to "Shop #{category.name}", category_path(category), class: "button is-primary mt-3" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,195 @@
+<h1 class="title is-2">Checkout</h1>
+
+<div class="columns">
+  <div class="column is-8">
+    <%= form_with model: @order, local: true do |f| %>
+      <% if @order.errors.any? %>
+        <div class="notification is-danger">
+          <h4><%= pluralize(@order.errors.count, "error") %> prohibited this order from being saved:</h4>
+          <ul>
+            <% @order.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="box">
+        <h3 class="title is-4">Contact Information</h3>
+        
+        <div class="field">
+          <%= f.label :email, class: "label" %>
+          <div class="control">
+            <%= f.email_field :email, class: "input", required: true %>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3 class="title is-4">Shipping Address</h3>
+        
+        <div class="columns">
+          <div class="column">
+            <div class="field">
+              <%= f.label :first_name, class: "label" %>
+              <div class="control">
+                <%= f.text_field :first_name, class: "input", required: true %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="column">
+            <div class="field">
+              <%= f.label :last_name, class: "label" %>
+              <div class="control">
+                <%= f.text_field :last_name, class: "input", required: true %>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="field">
+          <%= f.label :address, class: "label" %>
+          <div class="control">
+            <%= f.text_area :address, class: "textarea", rows: 3, required: true %>
+          </div>
+        </div>
+        
+        <div class="columns">
+          <div class="column">
+            <div class="field">
+              <%= f.label :city, class: "label" %>
+              <div class="control">
+                <%= f.text_field :city, class: "input", required: true %>
+              </div>
+            </div>
+          </div>
+          
+          <div class="column">
+            <div class="field">
+              <%= f.label :province, class: "label" %>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <%= f.select :province, options_for_select([
+                    ['Alberta', 'AB'],
+                    ['British Columbia', 'BC'],
+                    ['Manitoba', 'MB'],
+                    ['New Brunswick', 'NB'],
+                    ['Newfoundland and Labrador', 'NL'],
+                    ['Northwest Territories', 'NT'],
+                    ['Nova Scotia', 'NS'],
+                    ['Nunavut', 'NU'],
+                    ['Ontario', 'ON'],
+                    ['Prince Edward Island', 'PE'],
+                    ['Quebec', 'QC'],
+                    ['Saskatchewan', 'SK'],
+                    ['Yukon', 'YT']
+                  ], @order.province), { prompt: 'Select Province' }, { required: true } %>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="column">
+            <div class="field">
+              <%= f.label :postal_code, class: "label" %>
+              <div class="control">
+                <%= f.text_field :postal_code, class: "input", required: true %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3 class="title is-4">Payment (Simulated)</h3>
+        <p class="has-text-grey">This is a demo store. No real payment will be processed.</p>
+        
+        <div class="field">
+          <label class="label">Card Number</label>
+          <div class="control">
+            <input type="text" class="input" placeholder="4242 4242 4242 4242" readonly>
+          </div>
+        </div>
+        
+        <div class="columns">
+          <div class="column">
+            <div class="field">
+              <label class="label">Expiry</label>
+              <div class="control">
+                <input type="text" class="input" placeholder="12/25" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="field">
+              <label class="label">CVV</label>
+              <div class="control">
+                <input type="text" class="input" placeholder="123" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="control">
+          <%= f.submit "Place Order", class: "button is-primary is-large" %>
+          <%= link_to "Back to Cart", cart_items_path, class: "button is-light is-large ml-2" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="column is-4">
+    <!-- Order Summary -->
+    <div class="box">
+      <h3 class="title is-4">Order Summary</h3>
+      
+      <% @cart_items.each do |cart_item| %>
+        <div class="level is-mobile">
+          <div class="level-left">
+            <div>
+              <p class="has-text-weight-semibold"><%= cart_item.product.name %></p>
+              <p class="is-size-7 has-text-grey">Qty: <%= cart_item.quantity %></p>
+            </div>
+          </div>
+          <div class="level-right">
+            <span>$<%= cart_item.total_price %></span>
+          </div>
+        </div>
+      <% end %>
+      
+      <hr>
+      
+      <div class="level">
+        <div class="level-left">
+          <span>Subtotal:</span>
+        </div>
+        <div class="level-right">
+          <span>$<%= @subtotal %></span>
+        </div>
+      </div>
+      
+      <div class="level">
+        <div class="level-left">
+          <span>Tax (<%= (@tax/@subtotal*100).round(1) %>%):</span>
+        </div>
+        <div class="level-right">
+          <span>$<%= @tax %></span>
+        </div>
+      </div>
+      
+      <hr>
+      
+      <div class="level">
+        <div class="level-left">
+          <span class="has-text-weight-bold">Total:</span>
+        </div>
+        <div class="level-right">
+          <span class="has-text-weight-bold is-size-5">$<%= @total %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

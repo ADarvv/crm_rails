@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Crm App" %></title>
+    <title><%= content_for(:title) || "My Ecommerce Store" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -10,19 +10,138 @@
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    
+    <!-- Bulma CSS Framework -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-
+    <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <!-- Navigation -->
+    <nav class="navbar is-primary" role="navigation">
+      <div class="navbar-brand">
+        <%= link_to "My Store", root_path, class: "navbar-item has-text-weight-bold is-size-4" %>
+        <%= link_to "About", page_path('about'), class: "navbar-item" %>
+        <%= link_to "Contact", page_path('contact'), class: "navbar-item" %>
+        
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+          <%= link_to "Products", products_path, class: "navbar-item" %>
+          <%= link_to "Categories", categories_path, class: "navbar-item" %>
+        </div>
+
+        <div class="navbar-end">
+          <!-- Search -->
+          <%= form_with url: products_path, method: :get, local: true, class: "navbar-item" do |f| %>
+            <div class="field has-addons">
+              <div class="control">
+                <%= f.text_field :search, placeholder: "Search products...", class: "input", value: params[:search] %>
+              </div>
+              <div class="control">
+                <%= f.submit "Search", class: "button is-info" %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Cart -->
+          <%= link_to cart_items_path, class: "navbar-item" do %>
+            <span class="icon-text">
+              <span class="icon">
+                <i class="fas fa-shopping-cart"></i>
+              </span>
+              <span>Cart (<%= cart_item_count %>)</span>
+            </span>
+          <% end %>
+
+          <!-- User Authentication -->
+          <% if user_signed_in? %>
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">
+                <%= current_user.first_name %>
+              </a>
+
+              <div class="navbar-dropdown">
+                <%= link_to "My Orders", orders_path, class: "navbar-item" %>
+                <%= link_to "Profile", edit_user_registration_path, class: "navbar-item" %>
+                <hr class="navbar-divider">
+                <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "navbar-item", form: { style: "display: inline;" } %>
+              </div>
+            </div>
+          <% else %>
+            <%= link_to "Login", new_user_session_path, class: "navbar-item" %>
+            <%= link_to "Sign Up", new_user_registration_path, class: "navbar-item" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <% if notice %>
+      <div class="notification is-success">
+        <button class="delete"></button>
+        <%= notice %>
+      </div>
+    <% end %>
+
+    <% if alert %>
+      <div class="notification is-danger">
+        <button class="delete"></button>
+        <%= alert %>
+      </div>
+    <% end %>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <%= yield %>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-6">
+      <div class="content has-text-centered">
+        <p>
+          <strong>My Ecommerce Store</strong> - Built with Ruby on Rails
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Burger menu toggle
+      document.addEventListener('DOMContentLoaded', () => {
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+        
+        if ($navbarBurgers.length > 0) {
+          $navbarBurgers.forEach( el => {
+            el.addEventListener('click', () => {
+              const target = el.dataset.target;
+              const $target = document.getElementById(target);
+              
+              el.classList.toggle('is-active');
+              $target.classList.toggle('is-active');
+            });
+          });
+        }
+
+        // Delete notifications
+        document.querySelectorAll('.notification .delete').forEach(($delete) => {
+          const $notification = $delete.parentNode;
+          $delete.addEventListener('click', () => {
+            $notification.parentNode.removeChild($notification);
+          });
+        });
+      });
+    </script>
   </body>
 </html>

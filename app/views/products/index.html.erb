@@ -1,0 +1,65 @@
+<div class="level">
+  <div class="level-left">
+    <div class="level-item">
+      <h1 class="title is-2">Products</h1>
+    </div>
+  </div>
+  
+  <div class="level-right">
+    <div class="level-item">
+      <%= form_with url: products_path, method: :get, local: true do |f| %>
+        <div class="field has-addons">
+          <div class="control">
+            <%= f.text_field :search, placeholder: "Search products...", class: "input", value: params[:search] %>
+          </div>
+          <div class="control">
+            <%= f.submit "Search", class: "button is-info" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Category Filter -->
+<div class="tabs is-boxed">
+  <ul>
+    <li class="<%= 'is-active' unless params[:category_id] %>">
+      <%= link_to "All Products", products_path %>
+    </li>
+    <% @categories.each do |category| %>
+      <li class="<%= 'is-active' if params[:category_id] == category.id.to_s %>">
+        <%= link_to category.name, products_path(category_id: category.id) %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<% if @category %>
+  <div class="notification is-info is-light">
+    Showing products in category: <strong><%= @category.name %></strong>
+    <%= link_to "Clear filter", products_path, class: "button is-small is-pulled-right" %>
+  </div>
+<% end %>
+
+<!-- Products Grid -->
+<div class="columns is-multiline">
+  <% @products.each do |product| %>
+    <div class="column is-3">
+      <%= render partial: "product_card", locals: { product: product } %>
+    </div>
+  <% end %>
+</div>
+
+<!-- ADD PAGINATION LINKS HERE -->
+<div class="has-text-centered mt-6">
+  <%= paginate @products, theme: 'twitter-bootstrap-4' %>
+</div>
+
+<% if @products.empty? %>
+  <div class="has-text-centered mt-6">
+    <h3 class="title is-3">No products found</h3>
+    <p>Try adjusting your search or browse all products.</p>
+    <%= link_to "View All Products", products_path, class: "button is-primary mt-3" %>
+  </div>
+<% end %>

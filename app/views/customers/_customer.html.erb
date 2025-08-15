@@ -4,7 +4,7 @@
       <% if customer.image.attached? %>
         <%= image_tag customer.image.variant(resize_to_limit: [100, 100]), alt: customer.full_name %>
         <% else %>
-        <%= image_tag "default-avatar.png", alt: "No image" %>
+        <%= image_tag "example.png", alt: "No image" %>
         <% end %>
     </div>
     <div class="media-content">
